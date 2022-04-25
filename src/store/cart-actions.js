@@ -2,6 +2,35 @@ import { cartActions } from "./cart-slice";
 import { uiActions } from "./ui-slice";
 
 //! Create action creator thunk :
+export const fetchCartData = () => {
+  return async (dispatch) => {
+    const fetchData = async () => {
+      const response = await fetch(
+        "https://redux-shopping-cart-4c8fe-default-rtdb.firebaseio.com/cart.json"
+      );
+
+      if (!response.ok) {
+        throw new Error("Couldn't fetch any cart data !!");
+      }
+
+      const data = await response.json();
+      return data;
+    };
+
+    try {
+      const cartData = await fetchData();
+      dispatch(cartActions.replaceCart(cartData));
+    } catch (error) {
+      dispatch(
+        uiActions.showNotification({
+          status: "error",
+          title: "Error !",
+          message: "Sending cart request failed !!",
+        })
+      );
+    }
+  };
+};
 
 export const sendCartData = function (cart) {
   return async (dispatch) => {
